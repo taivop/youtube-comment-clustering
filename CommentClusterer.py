@@ -72,12 +72,16 @@ class CommentClusterer:
                 comments_in_cluster.sort(key=lambda x: x[2])
 
                 f.write("===== CLUSTER {} =====\n".format(cluster_index))
-                for c in comments_in_cluster:
+                f.write("======================\n")
+                f.write("{}\n".format(comments_in_cluster[0][1]))
+                f.write("======================\n")
+                for c in comments_in_cluster[1:5]:
+                    pass
                     f.write("{:.2f}\t{}\n".format(c[2], c[1]))
                 f.write("\n")
 
 
 cc = CommentClusterer("data/comment_100000.csv", num_topics=30)
 
-cc.cluster_comments("yC4eEuURH8c", num_clusters=5)
+cc.cluster_comments("tN3iNxr2bhk", num_clusters=10)
 
