@@ -50,7 +50,7 @@ class CommentClusterer:
 
     def cluster_comments(self, video_id, num_clusters, report_filename="cluster_summary.txt"):
         """Return clusters of comments for given video ID."""
-        comment_texts = self.comments[video_id]
+        comment_texts = list(set(self.comments[video_id]))
         comment_features = [self.model[self.corpus.dictionary.doc2bow(self.corpus.tokenise(x))] for x in comment_texts]
         comment_features_array = np.asarray([matutils.sparse2full(row, self.num_topics) for row in comment_features])
         print(comment_features_array.shape)
@@ -77,8 +77,7 @@ class CommentClusterer:
                 f.write("\n")
 
 
+cc = CommentClusterer("data/comment_100000.csv", num_topics=30)
 
-cc = CommentClusterer("data/comment_10000.csv", num_topics=30)
-
-cc.cluster_comments("39ZQVBCHAoo", num_clusters=5)
+cc.cluster_comments("yC4eEuURH8c", num_clusters=5)
 
