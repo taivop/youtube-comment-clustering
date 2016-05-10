@@ -48,7 +48,7 @@ class CommentClusterer:
         """Build the model that maps comments to a vector space"""
         self.model = models.LsiModel(self.corpus, num_topics=self.num_topics)
 
-    def cluster_comments(self, video_id, num_clusters):
+    def cluster_comments(self, video_id, num_clusters, report_filename="cluster_summary.txt"):
         """Return clusters of comments for given video ID."""
         comment_texts = self.comments[video_id]
         comment_features = [self.model[self.corpus.dictionary.doc2bow(self.corpus.tokenise(x))] for x in comment_texts]
@@ -60,23 +60,25 @@ class CommentClusterer:
         labels = clus.predict(comment_features_array)
         distances = np.min(clus.transform(comment_features_array), axis=1)
 
-        self.summarise_clusters(labels, comment_texts, distances, num_clusters)
+        self.summarise_clusters(labels, comment_texts, distances, num_clusters, filename=report_filename)
 
-    def summarise_clusters(self, assignments, texts, distances, num_clusters):
+    def summarise_clusters(self, assignments, texts, distances, num_clusters, filename):
         zipped = list(zip(assignments, texts, distances))
 
-        for cluster_index in range(num_clusters):
-            comments_in_cluster = list(filter(lambda x: x[0] == cluster_index, zipped))
-            comments_in_cluster.sort(key=lambda x: x[2])
+        with open(filename, 'w') as f:
 
-            print("CLUSTER {}".format(cluster_index))
-            for c in comments_in_cluster:
-                print("{:.2f}\t{}".format(c[2], c[1]))
-            print()
+            for cluster_index in range(num_clusters):
+                comments_in_cluster = list(filter(lambda x: x[0] == cluster_index, zipped))
+                comments_in_cluster.sort(key=lambda x: x[2])
+
+                f.write("===== CLUSTER {} =====\n".format(cluster_index))
+                for c in comments_in_cluster:
+                    f.write("{:.2f}\t{}\n".format(c[2], c[1]))
+                f.write("\n")
 
 
 
 cc = CommentClusterer("data/comment_10000.csv", num_topics=30)
 
-cc.cluster_comments("yC4eEuURH8c", num_clusters=5)
+cc.cluster_comments("39ZQVBCHAoo", num_clusters=5)
 
